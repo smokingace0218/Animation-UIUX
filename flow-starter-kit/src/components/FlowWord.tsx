@@ -19,7 +19,7 @@ const BAND = 0.62 * UNITS; // stream width
 const BEHIND = 0.07 * UNITS; // drop distance behind the front
 const DROP_R = 0.045 * UNITS;
 const DROPLET_R = 0.028 * UNITS;
-const SAMPLES = 72;
+const SAMPLES = 48;
 
 type Geo = {
   x: number;
@@ -119,15 +119,25 @@ export function FlowWord() {
     const lag = { x: 0, y: 0 };
 
     const roll = (x: number, amp: number, t: number) =>
-      amp * Math.sin(((x - pathStart) / wavelength) * Math.PI * 2 - t * 0.0042);
+      amp * Math.sin(((x - pathStart) / wavelength) * Math.PI * 2 - t * 0.0028);
 
     const baseline = (amp: number, t: number) => {
-      let d = "";
+      // quadratic segments through the midpoints keep the tangent continuous,
+      // so the glyphs riding the path turn smoothly instead of in steps
+      const pts: [number, number][] = [];
       for (let i = 0; i <= SAMPLES; i++) {
         const x = pathStart + ((pathEnd - pathStart) * i) / SAMPLES;
-        d += `${i ? "L" : "M"}${x.toFixed(2)} ${roll(x, amp, t).toFixed(2)}`;
+        pts.push([x, roll(x, amp, t)]);
       }
-      return d;
+      const f = (v: number) => v.toFixed(2);
+      let d = `M${f(pts[0][0])} ${f(pts[0][1])}`;
+      for (let i = 1; i < pts.length - 1; i++) {
+        const mx = (pts[i][0] + pts[i + 1][0]) / 2;
+        const my = (pts[i][1] + pts[i + 1][1]) / 2;
+        d += `Q${f(pts[i][0])} ${f(pts[i][1])} ${f(mx)} ${f(my)}`;
+      }
+      const end = pts[pts.length - 1];
+      return `${d}L${f(end[0])} ${f(end[1])}`;
     };
 
     const heightAt = (x: number) => {
@@ -146,13 +156,13 @@ export function FlowWord() {
         const pts: string[] = [];
         for (let i = 0; i <= steps; i++) {
           const y = top + ((bottom - top) * i) / steps;
-          const x = front + offset - SLANT * ((y - top) / (bottom - top)) + amp * Math.sin(y * k + t * 0.006 + phase);
+          const x = front + offset - SLANT * ((y - top) / (bottom - top)) + amp * Math.sin(y * k + t * 0.004 + phase);
           pts.push(`${x.toFixed(2)} ${y.toFixed(2)}`);
         }
         return pts;
       };
-      const lead = edge(0, 0, 0.07, 0.03 * UNITS);
-      const tail = edge(-BAND, 1.7, 0.05, 0.04 * UNITS).reverse();
+      const lead = edge(0, 0, 0.07, 0.022 * UNITS);
+      const tail = edge(-BAND, 1.7, 0.05, 0.03 * UNITS).reverse();
       return `M${lead.join("L")}L${tail.join("L")}Z`;
     };
 
@@ -177,12 +187,14 @@ export function FlowWord() {
       }
 
       const t = now - start;
-      const amp = ROLL * Math.sin(Math.PI * p);
+      // sin² swells and settles with no jolt at either end
+      const amp = ROLL * Math.sin(Math.PI * p) ** 2;
       path.setAttribute("d", baseline(amp, t));
 
       const from = geo.inkLeft - 0.05 * UNITS;
       const to = geo.inkRight + BAND + SLANT + 0.05 * UNITS;
-      const front = from + (to - from) * glide(p);
+      // half linear, half eased: no rush through the middle letters, soft at the ends
+      const front = from + (to - from) * (0.5 * p + 0.5 * glide(p));
       stream.setAttribute("d", streamShape(front, t));
 
       // the drop rides just behind the front, at its letter's height, on the rolled baseline
@@ -192,7 +204,7 @@ export function FlowWord() {
         lag.x = x;
         lag.y = y;
       }
-      const k = 1 - Math.exp(-dt / 55);
+      const k = 1 - Math.exp(-dt / 70);
       lag.x += (x - lag.x) * k;
       lag.y += (y - lag.y) * k;
       const dx = lag.x - x;
