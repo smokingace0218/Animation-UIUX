@@ -243,6 +243,19 @@ a {
   font-weight: 300;
   line-height: 1.5;
   color: var(--muted);
+  opacity: calc(0.42 + 0.58 * var(--order, 0));
+  filter: url(#copy-noise);
+}
+
+[data-state="flow"] .hero-copy {
+  filter: none;
+}
+
+.noise-defs {
+  position: absolute;
+  width: 0;
+  height: 0;
+  overflow: hidden;
 }
 
 .hero-ctas {
@@ -273,6 +286,24 @@ a {
 .btn-glass:hover {
   background: rgba(255, 255, 255, 0.1);
   border-color: rgba(255, 255, 255, 0.2);
+}
+
+/* at flow, Get Started steps forward and the secondary steps back */
+.cta-primary {
+  transition: transform 0.9s var(--glide), box-shadow 0.9s var(--glide);
+}
+
+.cta-secondary {
+  transition: opacity 0.9s var(--glide), background-color 0.35s var(--glide), border-color 0.35s var(--glide);
+}
+
+[data-state="flow"] .cta-primary {
+  transform: scale(1.06);
+  box-shadow: -10px 6px 28px rgba(25, 217, 191, 0.32), 10px 10px 32px rgba(122, 60, 255, 0.34);
+}
+
+[data-state="flow"] .cta-secondary {
+  opacity: 0.62;
 }
 
 /* Get Started: a 1.5px gradient ring 4px outside it, and a soft halo */
