@@ -37,7 +37,7 @@ export function SiteHeader() {
         <a className="sign-in" href="#sign-in">
           Sign in
         </a>
-        <a className="btn-white" href="#get-started">
+        <a className="btn-white cta-ring" href="#get-started">
           Get Started
         </a>
       </div>
