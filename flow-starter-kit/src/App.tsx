@@ -17,11 +17,12 @@ export function App() {
       <div className="hero-field">
         <LiquidDimensionalField />
       </div>
+      <div className="hero-scrim" aria-hidden="true" />
       <SiteHeader />
 
       <svg className="noise-defs" aria-hidden="true" focusable="false">
         <filter id="copy-noise" x="-5%" y="-30%" width="110%" height="160%" colorInterpolationFilters="sRGB">
-          <feTurbulence ref={turbulence} type="fractalNoise" baseFrequency="0.012 0.019" numOctaves={2} seed={7} result="noise" />
+          <feTurbulence ref={turbulence} type="fractalNoise" baseFrequency="0.012 0.05" numOctaves={2} seed={7} result="noise" />
           <feDisplacementMap ref={displace} in="SourceGraphic" in2="noise" scale={16} xChannelSelector="R" yChannelSelector="G" result="displaced" />
           <feGaussianBlur ref={blur} in="displaced" stdDeviation={1.4} />
         </filter>

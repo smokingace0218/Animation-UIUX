@@ -54,8 +54,8 @@ export function useFlowOrder({ hero, displace, blur, turbulence }: FlowOrderRefs
       displaceEl.setAttribute("scale", (16 * rest).toFixed(3));
       blurEl.setAttribute("stdDeviation", (1.4 * rest).toFixed(3));
       // the noise itself keeps shifting a little while it is there
-      const drift = 0.012 + 0.003 * Math.sin(now * 0.0011);
-      turbulenceEl.setAttribute("baseFrequency", `${drift.toFixed(4)} ${(drift * 1.6).toFixed(4)}`);
+      const drift = 0.012 + 0.004 * Math.sin(now * 0.0011);
+      turbulenceEl.setAttribute("baseFrequency", `${drift.toFixed(4)} 0.05`);
       send();
     };
 
