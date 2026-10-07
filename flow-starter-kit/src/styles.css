@@ -48,6 +48,14 @@ a {
   display: flex;
   flex-direction: column;
   overflow: hidden;
+  pointer-events: none;
+}
+
+/* the background takes the pointer everywhere except the controls and the word */
+.hero a,
+.hero button,
+.flow-word {
+  pointer-events: auto;
 }
 
 .hero-field {
@@ -215,6 +223,7 @@ a {
   align-items: flex-start;
   padding: 2rem clamp(1rem, 4vw, 2.75rem) clamp(3rem, 9vh, 6rem);
   text-align: left;
+  pointer-events: none;
 }
 
 .hero-title {
